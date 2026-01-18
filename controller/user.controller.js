@@ -1,16 +1,82 @@
 import { response } from "express";
 import asyncHandler from "../utils/asyncHndler.js";
+import { ApiError } from "../utils/ApiError.js";
+import User from "../models/user.models.js";
+import { uploadOnCloudinaryy } from "../utils/cloudinary.utils.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
 
-const handleRegisterUser = asyncHandler((req, res) => {
-  throw new Error("Something broke");
-  //   return res.send("HELLO");
+const handleRegisterUser = asyncHandler(async (req, res) => {
+  // get user credentials
+  const { fullName, userName, email, password } = req.body;
+  // validate
+  if (
+    [fullName, userName, email, password].some((field) => field?.trim() === "")
+  ) {
+    throw new ApiError(400, "All the fields are required");
+  }
+  // check if user already exists => username email
+  const existedUser = await User.findOne({
+    $or: [{ userName }, { email }],
+  });
+  if (existedUser) {
+    throw new ApiError(
+      409,
+      "userName or Email already exists rror Already exists",
+    );
+  }
+  // check for images check for avatar
+  //   const avatarLocalPath = req.files?.avatar[0]?.path;
+  //   const coverImagePath = req.files?.coverImage[0].path;
+
+  //   if (!avatarLocalPath) {
+  //     throw new ApiError(409, "Avatar is required****");
+  //   }
+  // upload thm to cloudinary
+  //   const avatar = await uploadOnCloudinaryy(avatarLocalPath);
+  //   const coverImage = await uploadOnCloudinaryy(coverImagePath);
+  // check success in avatar
+  //   if (!avatar) {
+  //     throw new ApiError(409, "Avatar is required_____");
+  //   }
+  // create user object - create entry
+  const user = await User.create({
+    userName: userName.toLowerCase(),
+    //  avatar: avatar?.url || "",
+    //  coverImage: coverImage?.url || "",
+    email,
+    password,
+    fullName,
+  });
+  console.log("USER: AT FIRST: ", user);
+  // remove password and refresh token
+  //   const createdUser = User.findById(user._id).select("-password -refreshToken");
+  //   console.log("USER: AT FIRST: ", createdUser);
+  // check if user created or not
+  //   if (!createdUser) {
+  //     throw new ApiError(500, "User not created");
+  //   }
+  //   return result
+  return res
+    .status(201)
+    .json(new ApiResponse(200, user, "User Registered successfully"));
+  //   return res.status(201).json({
+  //     statusCode: 200,
+  //     data: createdUser,
+  //     message: "Successfully created User",
+  //   });
 });
+
+export default handleRegisterUser;
+
 // async function handleRegisterUser(req, res) {
 //   //   return res.send("HELLO");
 //   throw new Error("Something broke");
 // }
 
-export default handleRegisterUser;
+// asyncHandler((req, res) => {
+//   throw new Error("Something broke");
+//   //   return res.send("HELLO");
+// });
 
 /**
  * Error: Something broke

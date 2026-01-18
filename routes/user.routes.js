@@ -1,8 +1,15 @@
 import express from "express";
 const userRouter = express.Router();
-
+import { upload } from "../middleware/multer.middleware.js";
 import handleRegisterUser from "../controller/user.controller.js";
 
-userRouter.get("/register", handleRegisterUser);
+userRouter.post(
+  "/register",
+  upload.fields([
+    { name: "avatar", maxCount: 1 },
+    { name: "coverImage", maxCount: 1 },
+  ]),
+  handleRegisterUser,
+);
 
 export default userRouter;
