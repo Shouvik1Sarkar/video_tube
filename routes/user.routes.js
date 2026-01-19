@@ -13,3 +13,6 @@ userRouter.post(
 );
 
 export default userRouter;
+
+// methods like fields, single, array, any are not own properties. of upload
+// They live on: Multer.prototype

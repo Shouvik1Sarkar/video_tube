@@ -25,40 +25,47 @@ const handleRegisterUser = asyncHandler(async (req, res) => {
     );
   }
   // check for images check for avatar
-  //   const avatarLocalPath = req.files?.avatar[0]?.path;
-  //   const coverImagePath = req.files?.coverImage[0].path;
+  console.log("REQUEST FILES: ", req.files);
+  console.log("9999999999999999999999999999999999999999999");
+  const avatarLocalPath = req.files?.avatar?.[0]?.path;
+  const coverImagePath = req.files?.coverImage?.[0]?.path;
+  console.log("9999999999999999999999999999999999999999999");
+  console.log("cover image: ", req.files);
+  console.log("cover image: ", coverImagePath);
 
-  //   if (!avatarLocalPath) {
-  //     throw new ApiError(409, "Avatar is required****");
-  //   }
+  if (!avatarLocalPath) {
+    throw new ApiError(409, "Avatar is required****");
+  }
   // upload thm to cloudinary
-  //   const avatar = await uploadOnCloudinaryy(avatarLocalPath);
-  //   const coverImage = await uploadOnCloudinaryy(coverImagePath);
+  const avatar = await uploadOnCloudinaryy(avatarLocalPath);
+  const coverImage = await uploadOnCloudinaryy(coverImagePath);
   // check success in avatar
-  //   if (!avatar) {
-  //     throw new ApiError(409, "Avatar is required_____");
-  //   }
+  if (!avatar) {
+    throw new ApiError(409, "Avatar is required_____");
+  }
   // create user object - create entry
   const user = await User.create({
     userName: userName.toLowerCase(),
-    //  avatar: avatar?.url || "",
-    //  coverImage: coverImage?.url || "",
+    avatar: avatar.url,
+    coverImage: coverImage?.url || "",
     email,
     password,
     fullName,
   });
   console.log("USER: AT FIRST: ", user);
   // remove password and refresh token
-  //   const createdUser = User.findById(user._id).select("-password -refreshToken");
-  //   console.log("USER: AT FIRST: ", createdUser);
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken",
+  );
+  console.log("USER: AT FIRST:==================== ", createdUser);
   // check if user created or not
-  //   if (!createdUser) {
-  //     throw new ApiError(500, "User not created");
-  //   }
+  if (!createdUser) {
+    throw new ApiError(500, "User not created");
+  }
   //   return result
   return res
     .status(201)
-    .json(new ApiResponse(200, user, "User Registered successfully"));
+    .json(new ApiResponse(200, createdUser, "User Registered successfully"));
   //   return res.status(201).json({
   //     statusCode: 200,
   //     data: createdUser,

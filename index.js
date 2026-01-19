@@ -21,9 +21,10 @@ app.use(express.static("static"));
 app.use(cookieParser());
 // app.use()
 
-// app.get("/", (req, res) => {
-//   res.send("This is home");
-// });
+app.get("/", (req, res) => {
+  console.log("req, ", req);
+  res.send("This is home");
+});
 // app.get("/shouvik", (req, res) => {
 //   res.send("This is Shouvik's home");
 // });
